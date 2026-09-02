@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SACRED SCRIPTURE — Trials of the Forgotten Age</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800;900&display=swap");
+  *{box-sizing:border-box} html,body{margin:0;height:100%;font-family:"Prompt",Arial,sans-serif;background:#050912;color:#fff;overflow:hidden}
+  button,input,textarea{font:inherit}
+  #app{height:100%;position:relative;background:url('Background.png') center/cover no-repeat}
+  #app::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,8,20,.28),rgba(2,6,15,.72))}
+  .screen{position:absolute;inset:0;z-index:2;display:none;align-items:center;justify-content:center;padding:24px;animation:fade .5s ease}
+  .screen.active{display:flex}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .logo{width:min(760px,92vw);filter:drop-shadow(0 16px 30px rgba(0,0,0,.55))}
+  .center{text-align:center;max-width:900px;width:100%}
+  .title-actions{margin-top:20px}
+  .btn{border:1px solid rgba(255,224,145,.55);background:linear-gradient(180deg,rgba(45,67,102,.95),rgba(16,26,49,.96));color:white;border-radius:16px;padding:14px 24px;cursor:pointer;box-shadow:0 8px 28px rgba(0,0,0,.35);transition:.18s;min-width:180px}
+  .btn:hover{transform:translateY(-2px);border-color:#ffd779}
+  .btn.gold{background:linear-gradient(180deg,#c8973e,#7a4d16);border-color:#ffe5a2}
+  .story-card{width:min(940px,94vw);background:rgba(7,14,29,.80);border:1px solid rgba(255,219,132,.30);border-radius:24px;padding:28px;backdrop-filter:blur(8px);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+  .story-text{font-size:clamp(20px,2.6vw,34px);line-height:1.6;text-align:center}
+  .small{opacity:.8;font-size:14px}
+  .scene{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:space-between;padding:4vh 4vw 24vh;pointer-events:none}
+  .sprite{max-height:64vh;max-width:42vw;object-fit:contain;filter:drop-shadow(0 18px 25px rgba(0,0,0,.6))}
+  .goddess{margin-left:auto;margin-right:auto;max-height:68vh}
+  .dialogue{position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);width:min(1000px,94vw);background:rgba(5,10,22,.9);border:1px solid rgba(255,217,128,.35);border-radius:22px;padding:20px 22px;z-index:5;box-shadow:0 18px 45px rgba(0,0,0,.45)}
+  .speaker{font-weight:700;color:#ffd878;margin-bottom:7px}
+  .dialogue p{margin:0;font-size:clamp(18px,2vw,25px);line-height:1.55}
+  .next{margin-top:14px;text-align:right}
+  .form{display:grid;grid-template-columns:1fr 1fr 150px;gap:12px;margin-top:18px}
+  input,textarea{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.17);padding:13px 14px;background:rgba(255,255,255,.08);color:white;outline:none}
+  textarea{min-height:110px;resize:vertical}
+  .battle-wrap{position:absolute;inset:0;z-index:3}
+  .hud{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:min(800px,94vw);display:flex;justify-content:space-between;gap:12px;z-index:8}
+  .pill{background:rgba(4,10,22,.82);border:1px solid rgba(255,255,255,.15);border-radius:999px;padding:9px 15px;backdrop-filter:blur(6px)}
+  .question-box{position:absolute;left:50%;bottom:3vh;transform:translateX(-50%);width:min(980px,96vw);z-index:9;background:rgba(5,10,22,.93);border:1px solid rgba(255,215,120,.38);border-radius:24px;padding:20px;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+  .qtext{text-align:center;font-size:clamp(20px,2.5vw,30px);font-weight:700;margin-bottom:14px}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .choice{padding:18px;border-radius:18px;border:1px solid rgba(255,255,255,.16);color:white;background:rgba(39,60,93,.92);cursor:pointer;font-size:clamp(18px,2.2vw,25px);transition:.18s}
+  .choice:hover{transform:translateY(-2px);border-color:#ffd66c}
+  .choice:disabled{opacity:.68;cursor:default;transform:none}
+  .answer-feedback{display:none;align-items:center;justify-content:space-between;gap:14px;margin-top:14px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)}
+  .answer-feedback.show{display:flex}
+  .feedback-text{font-weight:700;font-size:17px}
+  .next-battle{min-width:130px}
+  .flash{position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:20;font-size:clamp(42px,8vw,100px);font-weight:900;text-shadow:0 8px 24px #000}
+  .flash.show{display:flex;animation:pop .6s ease}
+  @keyframes pop{0%{opacity:0;transform:scale(.6)}35%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(1)}}
+  .boss-input{margin-top:16px}
+  .book{max-height:50vh;max-width:80vw;filter:drop-shadow(0 0 28px rgba(255,220,110,.6))}
+  .ending-quote{font-size:clamp(19px,2.4vw,30px);line-height:1.65}
+  .summary-wrap{width:min(1050px,96vw);max-height:94vh;overflow:auto;background:rgba(246,241,226,.97);color:#172033;border-radius:22px;padding:26px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+  .summary-head{text-align:center;border-bottom:2px solid #c89b43;padding-bottom:14px}
+  .summary-head h1{margin:0;font-size:30px}
+  .score{font-size:46px;font-weight:900;color:#8a5b16;margin:6px 0}
+  .student{font-size:18px}
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+  .ans{background:#fff;border:1px solid #ddd3bd;border-radius:14px;padding:11px 12px;font-size:14px}
+  .final-answer{margin-top:14px;background:#fff;border:2px solid #c89b43;border-radius:15px;padding:14px}
+  .capture{margin-top:14px;text-align:center;font-weight:700;color:#7a4d16}
+  .footer-note{text-align:center;margin-top:10px;font-size:12px;opacity:.7}
+  @media(max-width:700px){
+    .form{grid-template-columns:1fr}
+    .scene{padding:6vh 2vw 30vh}
+    .sprite{max-height:48vh;max-width:48vw}
+    .choices{grid-template-columns:1fr 1fr}
+    .answers{grid-template-columns:1fr}
+    .summary-wrap{padding:18px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <audio id="bgm" src="Song.mp3" loop></audio>
+
+  <section id="title" class="screen active">
+    <div class="center">
+      <img class="logo" src="Logo Game.png" alt="THE SACRED SCRIPTURE">
+      <div class="title-actions"><button class="btn gold" onclick="startGame()">เริ่มการผจญภัย</button></div>
+      <p class="small">Present Simple & Past Simple • M.1</p>
+    </div>
+  </section>
+
+  <section id="prologue" class="screen">
+    <div class="story-card">
+      <div id="prologueText" class="story-text"></div>
+      <div class="next"><button class="btn" onclick="nextPrologue()">ต่อไป</button></div>
+    </div>
+  </section>
+
+  <section id="goddessIntro" class="screen">
+    <div class="scene"><img class="sprite goddess" src="Celestial Goddess.png" alt=""></div>
+    <div class="dialogue">
+      <div class="speaker">เทพธิดา</div>
+      <p>สวัสดี นักเดินทาง... ก่อนอื่นข้าขอรู้จักเจ้าก่อน เจ้าชื่ออะไร?</p>
+      <div class="form">
+        <input id="firstName" placeholder="ชื่อ">
+        <input id="lastName" placeholder="นามสกุล">
+        <input id="studentNo" placeholder="เลขที่" inputmode="numeric">
+      </div>
+      <div class="next"><button class="btn gold" onclick="submitStudent()">ยืนยัน</button></div>
+    </div>
+  </section>
+
+  <section id="goddessMission" class="screen">
+    <div class="scene"><img class="sprite goddess" src="Celestial Goddess.png" alt=""></div>
+    <div class="dialogue">
+      <div class="speaker">เทพธิดา</div>
+      <p id="missionText"></p>
+      <div class="next"><button class="btn gold" onclick="beginBattles()">รับภารกิจ</button></div>
+    </div>
+  </section>
+
+  <section id="battle" class="screen">
+    <div class="battle-wrap">
+      <div class="hud">
+        <div class="pill" id="stageLabel">DEMON I</div>
+        <div class="pill" id="progressLabel">1 / 10</div>
+      </div>
+      <div class="scene">
+        <img class="sprite" src="Cat.png" alt="Hero">
+        <img id="demonSprite" class="sprite" src="Demon.png" alt="Demon">
+      </div>
+      <div class="question-box">
+        <div id="qText" class="qtext"></div>
+        <div id="choices" class="choices"></div>
+        <div id="answerFeedback" class="answer-feedback">
+          <div id="feedbackText" class="feedback-text"></div>
+          <button id="nextBattleBtn" class="btn gold next-battle" onclick="advanceBattle()">ไปต่อ</button>
+        </div>
+      </div>
+      <div id="flash" class="flash"></div>
+    </div>
+  </section>
+
+  <section id="halfway" class="screen">
+    <div class="scene"><img class="sprite goddess" src="Celestial Goddess.png" alt=""></div>
+    <div class="dialogue">
+      <div class="speaker">เทพธิดา</div>
+      <p>เธอเก่งมากที่ผ่านมาได้ครึ่งทางแล้ว ต่อไปอาจจะยากขึ้น แต่เธอจะทำมันได้นะ</p>
+      <div class="next"><button class="btn gold" onclick="continueBattles()">ไปต่อ</button></div>
+    </div>
+  </section>
+
+  <section id="betrayal" class="screen">
+    <div class="scene"><img class="sprite goddess" src="Fallen Goddess of Crimson Shadows.png" alt=""></div>
+    <div class="dialogue">
+      <div class="speaker" style="color:#ff7373">Fallen Goddess</div>
+      <p>ที่ฉันทำไปทั้งหมด... ก็เพื่อหลอกแกมากำจัดพวกนั้นเอง! แกมันเก่งเกินไป ฉันไม่สามารถควบคุมแกได้ แต่ลูกสมุนของฉันอ่อนหัดเกินไป... มาเจอฉันหน่อยดีกว่า!</p>
+      <div class="next"><button class="btn gold" onclick="showFinalQuestion()">FINAL BOSS</button></div>
+    </div>
+  </section>
+
+  <section id="finalQuestion" class="screen">
+    <div class="scene">
+      <img class="sprite" src="Cat.png" alt="">
+      <img class="sprite" src="Fallen Goddess of Crimson Shadows.png" alt="">
+    </div>
+    <div class="dialogue">
+      <div class="speaker" style="color:#ff7373">FINAL QUESTION</div>
+      <p><b>ทำไมคุณถึงต้องเรียนภาษาอังกฤษ?</b><br><span class="small">พิมพ์อย่างน้อย 10 ตัวอักษร</span></p>
+      <div class="boss-input"><textarea id="reflection" placeholder="คำตอบของฉัน..."></textarea></div>
+      <div class="next"><button class="btn gold" onclick="submitReflection()">ตอบคำถาม</button></div>
+    </div>
+  </section>
+
+  <section id="redeem" class="screen">
+    <div class="scene"><img class="sprite goddess" src="Fallen Goddess of Crimson Shadows.png" alt=""></div>
+    <div class="dialogue">
+      <div class="speaker">Fallen Goddess</div>
+      <p id="redeemText"></p>
+      <div class="next"><button class="btn" onclick="showBook()">ต่อไป</button></div>
+    </div>
+  </section>
+
+  <section id="bookScene" class="screen">
+    <div class="center">
+      <img class="book" src="Celestial Grimoire of Radiant Wisdom.png" alt="Sacred Scripture">
+      <div class="story-card" style="margin:16px auto 0;padding:20px">
+        <div class="story-text" style="font-size:22px">เมื่อเปิดพระคัมภีร์ศักดิ์สิทธิ์... กลับพบว่าหน้ากระดาษนั้นว่างเปล่า</div>
+        <div class="next"><button class="btn gold" onclick="showEnding()">อ่านต่อ</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ending" class="screen">
+    <div class="story-card center">
+      <div class="ending-quote">
+        “หนังสือก็คือตัวเรา เราจะเติมอะไรเข้าไปก็ขึ้นอยู่ที่เรา<br>
+        การศึกษาไม่มีอายุและเวลากำหนด<br>
+        เริ่มทำมันตอนนี้ และพิชิตความสามารถของตนเอง”
+        <br><br><b>— ครูพีพี</b>
+      </div>
+      <div class="next" style="text-align:center"><button class="btn gold" onclick="showSummary()">ดูสรุปผลคะแนน</button></div>
+    </div>
+  </section>
+
+  <section id="summary" class="screen">
+    <div id="summaryCard" class="summary-wrap">
+      <div class="summary-head">
+        <h1>MISSION COMPLETE</h1>
+        <div id="studentSummary" class="student"></div>
+        <div id="scoreSummary" class="score"></div>
+        <div>THE SACRED SCRIPTURE • Trials of the Forgotten Age</div>
+      </div>
+      <div id="answerList" class="answers"></div>
+      <div class="final-answer">
+        <b>FINAL BOSS — คำตอบข้อ 11</b>
+        <div id="reflectionSummary" style="margin-top:8px"></div>
+      </div>
+      <div class="capture">📸 แคปหน้าจอนี้ แล้วส่งในอัลบั้มของกลุ่ม</div>
+      <div class="footer-note">Present Simple & Past Simple • Created by Teacher PP</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const screens = [...document.querySelectorAll('.screen')];
+function show(id){ screens.forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+const prologueLines = [
+  "ฉันคือใครกันนะ...?",
+  "แล้วฉันมาอยู่ที่นี่ได้อย่างไรกัน...?",
+  "สถานที่แห่งนี้ดูเหมือนจะเป็นโลกจากยุคที่ถูกลืม...",
+  "แต่ก่อนที่จะหาคำตอบ ฉันต้องรู้ก่อนว่า... ใครกำลังเรียกฉันอยู่?"
+];
+let prologueIndex=0;
+
+let student={first:"",last:"",no:""};
+let current=0, actualCorrect=0, reflection="";
+let answers=[];
+let questions=[];
+
+const demonFiles = [
+  "Demon.png",
+  "Demon%20%282%29.png",
+  "Demon%20%283%29.png",
+  "Demon%20%284%29.png",
+  "Demon%20%285%29.png",
+  "Demon%20%286%29.png",
+  "Demon%20%287%29.png",
+  "Demon%20%288%29.png",
+  "Demon%20%289%29.png",
+  "Demon%20%2810%29.png"
+];
+
+const pool = [
+ {t:"Tom ___ to school every day.", a:["goes","went"], c:"goes", tense:"Present Simple"},
+ {t:"My mother ___ coffee every morning.", a:["drinks","drank"], c:"drinks", tense:"Present Simple"},
+ {t:"They ___ football on Sundays.", a:["play","played"], c:"play", tense:"Present Simple"},
+ {t:"Jane ___ English very well.", a:["speaks","spoke"], c:"speaks", tense:"Present Simple"},
+ {t:"The sun ___ in the east.", a:["rises","rose"], c:"rises", tense:"Present Simple"},
+ {t:"We ___ dinner at 7 p.m. every day.", a:["eat","ate"], c:"eat", tense:"Present Simple"},
+ {t:"He usually ___ his homework after school.", a:["does","did"], c:"does", tense:"Present Simple"},
+ {t:"Cats ___ milk.", a:["like","liked"], c:"like", tense:"Present Simple"},
+ {t:"My sister ___ TV every evening.", a:["watches","watched"], c:"watches", tense:"Present Simple"},
+ {t:"I ___ my teeth twice a day.", a:["brush","brushed"], c:"brush", tense:"Present Simple"},
+ {t:"Yesterday, I ___ my grandmother.", a:["visit","visited"], c:"visited", tense:"Past Simple"},
+ {t:"She ___ a movie last night.", a:["watches","watched"], c:"watched", tense:"Past Simple"},
+ {t:"We ___ to the beach last Sunday.", a:["go","went"], c:"went", tense:"Past Simple"},
+ {t:"Tom ___ breakfast at 7 a.m. yesterday.", a:["eats","ate"], c:"ate", tense:"Past Simple"},
+ {t:"They ___ football after school yesterday.", a:["play","played"], c:"played", tense:"Past Simple"},
+ {t:"My father ___ a new phone last week.", a:["buys","bought"], c:"bought", tense:"Past Simple"},
+ {t:"I ___ very tired last night.", a:["am","was"], c:"was", tense:"Past Simple"},
+ {t:"Anna ___ her room yesterday.", a:["cleans","cleaned"], c:"cleaned", tense:"Past Simple"},
+ {t:"The students ___ the test last Monday.", a:["take","took"], c:"took", tense:"Past Simple"},
+ {t:"He ___ his friend two days ago.", a:["calls","called"], c:"called", tense:"Past Simple"}
+];
+
+function shuffle(a){ return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+
+function buildQuestions(){
+  const present=shuffle(pool.filter(q=>q.tense==="Present Simple")).slice(0,5);
+  const past=shuffle(pool.filter(q=>q.tense==="Past Simple")).slice(0,5);
+  questions=shuffle([...present,...past]).map(q=>({...q,a:shuffle([...q.a])}));
+}
+
+function startGame(){
+  const bgm=document.getElementById("bgm");
+  bgm.volume=.35; bgm.play().catch(()=>{});
+  prologueIndex=0; document.getElementById("prologueText").textContent=prologueLines[0];
+  show("prologue");
+}
+function nextPrologue(){
+  prologueIndex++;
+  if(prologueIndex<prologueLines.length) document.getElementById("prologueText").textContent=prologueLines[prologueIndex];
+  else show("goddessIntro");
+}
+function submitStudent(){
+  const f=document.getElementById("firstName").value.trim();
+  const l=document.getElementById("lastName").value.trim();
+  const n=document.getElementById("studentNo").value.trim();
+  if(!f||!l||!n){ alert("กรุณากรอกชื่อ นามสกุล และเลขที่ให้ครบครับ"); return; }
+  student={first:f,last:l,no:n};
+  document.getElementById("missionText").innerHTML =
+    `<b>${f} ${l} เลขที่ ${n}</b>... เพราะดีนะ<br><br>`+
+    `ตอนนี้เราอยู่ในดินแดนโบราณแห่งหนึ่ง สิ่งที่เจ้าต้องทำคือกำจัดปีศาจทั้ง 10 ตัว `+
+    `และยึดคืนพระคัมภีร์ศักดิ์สิทธิ์ที่จะช่วยเหลือโลกนี้ไว้ จงใช้ความรู้เรื่อง <b>Present Simple</b> และ <b>Past Simple</b> เป็นอาวุธของเจ้า!`;
+  show("goddessMission");
+}
+function beginBattles(){
+  buildQuestions(); current=0; actualCorrect=0; answers=[];
+  show("battle"); renderBattle();
+}
+function roman(n){ return ["I","II","III","IV","V","VI","VII","VIII","IX","X"][n-1]; }
+function renderBattle(){
+  const q=questions[current];
+  document.getElementById("stageLabel").textContent=`DEMON ${roman(current+1)}`;
+  document.getElementById("progressLabel").textContent=`${current+1} / 10`;
+  const demon = document.getElementById("demonSprite");
+  demon.onerror = function(){
+    const base = "https://raw.githubusercontent.com/patcharaphongdsn/THE-SACRED-SCRIPTURE-Trials-of-the-Forgotten-Age-Present-Simple-Past-Simple/main/";
+    const rawNames = ["Demon.png","Demon%20%282%29.png","Demon%20%283%29.png","Demon%20%284%29.png","Demon%20%285%29.png","Demon%20%286%29.png","Demon%20%287%29.png","Demon%20%288%29.png","Demon%20%289%29.png","Demon%20%2810%29.png"];
+    if(!this.dataset.fallback){ this.dataset.fallback="1"; this.src=base+rawNames[current]; }
+  };
+  demon.dataset.fallback="";
+  demon.src=demonFiles[current];
+  document.getElementById("qText").innerHTML=`<span style="color:#ffd978">${q.tense}</span><br>${q.t}`;
+  const box=document.getElementById("choices"); box.innerHTML="";
+  document.getElementById("answerFeedback").classList.remove("show");
+  document.getElementById("feedbackText").textContent="";
+  q.a.forEach(choice=>{
+    const b=document.createElement("button"); b.className="choice"; b.textContent=choice;
+    b.onclick=()=>answerQuestion(choice); box.appendChild(b);
+  });
+}
+function flash(text,color){
+  const f=document.getElementById("flash"); f.textContent=text; f.style.color=color; f.classList.remove("show");
+  void f.offsetWidth; f.classList.add("show");
+}
+function answerQuestion(choice){
+  const q=questions[current], correct=choice===q.c;
+  if(correct) actualCorrect++;
+  answers.push({num:current+1,question:q.t,choice,correctAnswer:q.c,correct,tense:q.tense});
+
+  // ล็อกตัวเลือกทันทีหลังตอบ เพื่อไม่ให้กดซ้ำ
+  document.querySelectorAll("#choices .choice").forEach(b=>b.disabled=true);
+
+  flash(correct?"⚔️ PERFECT!":"💥 HIT!", correct?"#ffe078":"#ff8d8d");
+
+  const feedback=document.getElementById("answerFeedback");
+  const text=document.getElementById("feedbackText");
+  text.innerHTML = correct
+    ? `✅ ตอบถูก! <span style="font-weight:400;opacity:.85">เตรียมไปด่านต่อไป</span>`
+    : `❌ ตอบผิด — คำตอบที่ถูกคือ <b>${escapeHtml(q.c)}</b> แต่ยังไปต่อได้`;
+  feedback.classList.add("show");
+}
+
+function advanceBattle(){
+  current++;
+  if(current===5){ show("halfway"); return; }
+  if(current>=10){ show("betrayal"); return; }
+  renderBattle();
+}
+
+function continueBattles(){ show("battle"); renderBattle(); }
+function showFinalQuestion(){ show("finalQuestion"); }
+function submitReflection(){
+  const r=document.getElementById("reflection").value.trim();
+  if(r.length<10){ alert("กรุณาพิมพ์คำตอบอย่างน้อย 10 ตัวอักษรครับ"); return; }
+  reflection=r;
+  document.getElementById("redeemText").innerHTML =
+    `“${escapeHtml(r)}”...<br><br>นี่คือเหตุผลของเจ้าอย่างนั้นหรือ...? `+
+    `บางทีสิ่งที่ฉันทำมาตลอดอาจผิดจริง ๆ ฉันขอโทษ... ฉันผิดไปแล้ว`;
+  show("redeem");
+}
+function showBook(){ show("bookScene"); }
+function showEnding(){ show("ending"); }
+function showSummary(){
+  const displayScore=Math.max(8,actualCorrect);
+  document.getElementById("studentSummary").textContent=`${student.first} ${student.last} • เลขที่ ${student.no}`;
+  document.getElementById("scoreSummary").textContent=`${displayScore} / 10`;
+  const list=document.getElementById("answerList"); list.innerHTML="";
+  answers.forEach(a=>{
+    const d=document.createElement("div"); d.className="ans";
+    d.innerHTML=`<b>ข้อ ${a.num}</b> • ${a.tense}<br>${escapeHtml(a.question)}<br>`+
+      `ตอบ: <b>${escapeHtml(a.choice)}</b> ${a.correct?"✅":"❌"}${a.correct?"":` • เฉลย: ${escapeHtml(a.correctAnswer)}`}`;
+    list.appendChild(d);
+  });
+  document.getElementById("reflectionSummary").textContent=reflection;
+  show("summary");
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); }
+</script>
+</body>
+</html>
